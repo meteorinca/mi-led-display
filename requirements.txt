@@ -1,0 +1,13 @@
+# MI Matrix Display - Raspberry Pi Multi-Display System
+
+## Requirements
+
+# Core BLE library (Raspberry Pi compatible)
+bleak>=0.21.0
+
+# REST API framework
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# Image processing
+Pillow>=10.0.0
