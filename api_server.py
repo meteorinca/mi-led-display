@@ -42,10 +42,20 @@ def list_displays():
     })
 
 
-@app.route('/displays/scan', methods=['POST'])
+@app.route('/displays/scan', methods=['GET', 'POST'])
 def scan_displays():
     """Scan for MI Matrix Display devices."""
-    timeout = request.json.get('timeout', 10) if request.json else 10
+    # Get timeout from query string or JSON body
+    timeout = 10
+    if request.method == 'POST' and request.data:
+        try:
+            data = request.get_json(force=True, silent=True)
+            if data and 'timeout' in data:
+                timeout = data['timeout']
+        except:
+            pass
+    elif request.args.get('timeout'):
+        timeout = int(request.args.get('timeout'))
     
     try:
         devices = run_async(_controller.scan(timeout))
@@ -58,15 +68,23 @@ def scan_displays():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route('/displays/<mac_address>/connect', methods=['POST'])
+@app.route('/displays/<mac_address>/connect', methods=['GET', 'POST'])
 def connect_display(mac_address: str):
     """Connect to a display by MAC address."""
     # Normalize MAC address format
     mac_address = mac_address.replace('-', ':').upper()
     
+    # Get grid_position from query string or JSON body
     grid_position = None
-    if request.json and 'grid_position' in request.json:
-        grid_position = request.json['grid_position']
+    if request.method == 'POST' and request.data:
+        try:
+            data = request.get_json(force=True, silent=True)
+            if data and 'grid_position' in data:
+                grid_position = data['grid_position']
+        except:
+            pass
+    elif request.args.get('grid_position'):
+        grid_position = int(request.args.get('grid_position'))
     
     try:
         success = run_async(_controller.connect_display(mac_address, grid_position))
