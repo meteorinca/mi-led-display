@@ -347,6 +347,25 @@ def set_image_by_position(position: int):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+# ==================== Root Route ====================
+
+@app.route('/', methods=['GET'])
+def index():
+    """Root endpoint - shows API is running."""
+    return jsonify({
+        "name": "MI Matrix Display API",
+        "version": "1.0",
+        "endpoints": [
+            "GET  /health",
+            "GET  /displays",
+            "POST /displays/scan",
+            "POST /displays/<mac>/connect",
+            "POST /displays/<mac>/pixel",
+            "POST /displays/<mac>/image"
+        ]
+    })
+
+
 # ==================== Health Check ====================
 
 @app.route('/health', methods=['GET'])
@@ -399,20 +418,22 @@ def run_server(host: str = '0.0.0.0', port: int = 5000, debug: bool = False):
     # Start controller
     asyncio.run_coroutine_threadsafe(_controller.start(), _loop)
     
-    print(f"""
-╔══════════════════════════════════════════════════════╗
-║     MI Matrix Display API Server                     ║
-╠══════════════════════════════════════════════════════╣
-║  Endpoints:                                          ║
-║    GET  /displays          - List all displays       ║
-║    POST /displays/scan     - Scan for devices        ║
-║    POST /displays/:mac/connect    - Connect          ║
-║    POST /displays/:mac/pixel      - Set pixel        ║
-║    POST /displays/:mac/image      - Set image        ║
-║    POST /grid/pixel        - Set global pixel        ║
-║    GET  /health            - Health check            ║
-╚══════════════════════════════════════════════════════╝
-    """)
+    print("")
+    print("=" * 50)
+    print("MI Matrix Display API Server")
+    print("=" * 50)
+    print("Server starting on http://{}:{}".format(host, port))
+    print("")
+    print("Endpoints:")
+    print("  GET  /              - API info")
+    print("  GET  /health        - Health check")
+    print("  GET  /displays      - List displays")
+    print("  POST /displays/scan - Scan for devices")
+    print("  POST /displays/<mac>/connect")
+    print("  POST /displays/<mac>/pixel")
+    print("  POST /displays/<mac>/image")
+    print("=" * 50)
+    print("")
     
     # Run Flask
     app.run(host=host, port=port, debug=debug, threaded=True)
@@ -420,3 +441,4 @@ def run_server(host: str = '0.0.0.0', port: int = 5000, debug: bool = False):
 
 if __name__ == '__main__':
     run_server()
+
